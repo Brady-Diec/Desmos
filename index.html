@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js"
+            integrity="sha512-BbVEDjbqdN3Eow8+empLMrJlxXRj5nEitiCAK5A1pUr66+jLVejo3PmjIaucRnjlB0P9R3rBUs3g5jXc8ti+fQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+
+    <style>
+        body {
+            background-image: url("Screenshot 2024-05-25 at 5.49.31 PM.png");
+            background-size: cover;
+        }
+        table {
+            border: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            padding: 20px 40px;
+            background-color: green;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            padding: 20px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            border: 2px solid black;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+
+        .graph-container canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="calculator">
+    <h1>Calculator</h1>
+
+    <div class="input-sections">
+        <label for="Calculator">Select Calculator/Desmos:</label>
+        <select name="Calculator" id="Calculator" onchange="toggleCalculator()">
+            <option value="normal">Normal Calculator</option>
+            <option value="graphing">Graphing Calculator</option>
+            <option value="scientific">Scientific Calculator</option>
+            
+        </select>
+    </div>
+
+    <div id="normalCalculator">
+        <table id="calcu">
+            <tr>
+                <td colspan="3"><input type="text" id="result"></td>
+                <td><input type="button" value="c" onclick="clr()"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="1" onclick="dis('1')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="2" onclick="dis('2')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="3" onclick="dis('3')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="/" onclick="dis('/')" onkeydown="myFunction(event)"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="4" onclick="dis('4')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="5" onclick="dis('5')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="6" onclick="dis('6')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="*" onclick="dis('*')" onkeydown="myFunction(event)"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="7" onclick="dis('7')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="8" onclick="dis('8')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="9" onclick="dis('9')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="-" onclick="dis('-')" onkeydown="myFunction(event)"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="0" onclick="dis('0')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="." onclick="dis('.')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="=" onclick="solve()"></td>
+                <td><input type="button" value="+" onclick="dis('+')" onkeydown="myFunction(event)"></td>
+            </tr>
+        </table>
+        
+    </div>
+    <div id="graphingCalculator" style="display: none;">
+        <div class="input-section">
+            <label for="equation">Enter equation(s):</label>
+            <input type="text" id="equations" placeholder="e.g., y = x^2">
+            <button onclick="plotGraph()">Plot Graph</button>
+        </div>
+        <div class="input-section">
+            <label for="equation">Remove All Graphs:</label>
+            <button onclick="removeAllGraphs()">Remove Graphs</button>
+        </div>
+        <div class="input-section">
+            <label for="range">Adjust Range:</label>
+            <input type="number" id="xMin" placeholder="X min" step="any">
+            <input type="number" id="xMax" placeholder="X max" step="any">
+            <input type="number" id="yMin" placeholder="Y min" step="any">
+            <input type="number" id="yMax" placeholder="Y max" step="any">
+        </div>
+        <div class="input-section">
+            <label for="increments">Adjust Increments:</label>
+            <input type="number" id="xDivisions" placeholder="X divisions">
+            <input type="number" id="yDivisions" placeholder="Y divisions">
+        </div>
+        <div class="graph-container">
+            <canvas id="graph"></canvas>
+        </div>
+    
+    </div>
+
+    <div id = "scientificCalculator" style="display: none;">
+        <table id="scientificCalculator">
+            <tr><td colspan="6">
+                <input id="display" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="1" onclick="dis('1')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="2" onclick="dis('2')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="3" onclick="dis('3')" onkeydown="myFunction(event)"></td>
+            
+           
+            <td><input type="button" value="C"
+                    onclick="display.value = ''"></td>
+            <td><input type="button" value="⌫"
+                    onclick="backspace()"></td>
+                    <td><input type="button" value="=" onclick="solve()"></td>
+        </tr>
+        <td><input type="button" value="4" onclick="dis('4')" onkeydown="myFunction(event)"></td>
+            <td><input type="button" value="5" onclick="dis('5')" onkeydown="myFunction(event)"></td>
+            <td><input type="button" value="6" onclick="dis('6')" onkeydown="myFunction(event)"></td>
+        
+           
+            
+            <td><input type="button" value="-" onclick="dis('-')" onkeydown="myFunction(event)"></td>
+            <td><input type="button" value="%"
+                    onclick="display.value += '%'"></td>
+            <td><input type="button" value="cos("
+                    onclick="display.value += 'cos('"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="7" onclick="dis('7')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="8" onclick="dis('8')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="9" onclick="dis('9')" onkeydown="myFunction(event)"></td>
+                    <td><input type="button" value="*" onclick="dis('*')" onkeydown="myFunction(event)"></td>
+            <td><input type="button" value="!"
+                    onclick="display.value += '!'"></td>
+            <td><input type="button" value="sin("
+                    onclick="display.value += 'sin('"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="0" onclick="dis('0')" onkeydown="myFunction(event)"></td>
+                <td><input type="button" value="." onclick="dis('.')" onkeydown="myFunction(event)"></td>
+                
+                <td><input type="button" value="+" onclick="dis('+')" onkeydown="myFunction(event)"></td>
+            
+            <td><input type="button" value=","
+                    onclick="display.value += ','"></td>
+            
+                    <td><input type="button" value="/" onclick="dis('/')" onkeydown="myFunction(event)"></td>
+            <td><input type="button" value="tan("
+                    onclick="display.value += 'tan('"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="E"
+                    onclick="e()"></td>
+            <td><input type="button" value="pi"
+                    onclick="pi()"></td>
+            <td><input type="button" value="^"
+                    onclick="power()"></td>
+            <td><input type="button" value="("
+                    onclick="display.value += '('"></td>
+            <td><input type="button" value=")"
+                    onclick="display.value += ')'"></td>
+            <td><input type="button" value="log("
+                    onclick="base10Log()"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="sqrt("
+                    onclick="squareRoot()"></td>
+            <td><input type="button" value="ln2"
+                    onclick="display.value += Math.LN2"></td>
+            <td><input type="button" value="log10("
+                    onclick="base10Log()"></td>
+            <td><input type="button" value="log2e"
+                    onclick="display.value += Math.LOG2E"></td>
+            <td><input type="button" value="log10e"
+                    onclick="display.value += Math.LOG10E"></td>
+            <td><input type="button" value="exp("
+                    onclick="display.value += 'exp('"></td>
+        </tr>
+    </table>
+    <div>
+
+
+    
+
+</div>
+
+<script>
+   function toggleCalculator(){
+        var calculator = document.getElementById("Calculator").value;
+        if (calculator == "graphing") {
+            document.getElementById("normalCalculator").style.display = "none";
+            document.getElementById("graphingCalculator").style.display = "block";
+            document.getElementById("scientificCalculator").style.display = "none";
+
+        } else if (calculator == "normal") {
+            document.getElementById("graphingCalculator").style.display = "none";
+            document.getElementById("normalCalculator").style.display = "block";
+            document.getElementById("scientificCalculator").style.display = "none";
+
+        } else if (calculator == "scientific") { 
+            document.getElementById("graphingCalculator").style.display = "none";
+            document.getElementById("normalCalculator").style.display = "none";
+            document.getElementById("scientificCalculator").style.display = "block"; // Corrected ID here
+        }
+    }
+
+    function dis(val) {
+        document.getElementById("result").value += val;
+    }
+
+    function integrate(equation, lowerLimit, upperLimit, numSegments) {
+        try {
+            const expression = math.compile(equation);
+            const dx = (upperLimit - lowerLimit) / numSegments;
+            let integral = 0;
+            for (let i = 0; i < numSegments; i++) {
+                const x1 = lowerLimit + i * dx;
+                const x2 = x1 + dx;
+                const y1 = expression.evaluate({ x: x1 });
+                const y2 = expression.evaluate({ x: x2 });
+                integral += (y1 + y2) * dx / 2;
+            }
+            return integral;
+        } catch (error) {
+            console.error('Error integrating equation:', error);
+            return NaN;
+        }
+    }
+
+    function differentiate(equation, xValue, h) {
+        try {
+            const expression = math.compile(equation);
+            const slope = (expression.evaluate({ x: xValue + h }) - expression.evaluate({ x: xValue })) / h;
+            return slope;
+        } catch (error) {
+            console.error('Error differentiating equation:', error);
+            return NaN;
+        }
+    }
+
+    function myFunction(event) {
+        if (event.key == '0' || event.key == '1'
+            || event.key == '2' || event.key == '3'
+            || event.key == '4' || event.key == '5'
+            || event.key == '6' || event.key == '7'
+            || event.key == '8' || event.key == '9'
+            || event.key == '+' || event.key == '-'
+            || event.key == '*' || event.key == '/')
+            document.getElementById("result").value += event.key;
+    }
+
+    function solve() {
+    let x = document.getElementById("display").value;
+    let y = math.evaluate(x); 
+    document.getElementById("display").value = y;
+}
+
+    function clr() {
+        document.getElementById("result").value = "";
+    }
+
+    // Graphing Calculator Functions
+    function removeAllGraphs() {
+        const canvas = document.getElementById('graph');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+    }
+
+    function plotGraph() {
+        const equations = document.getElementById('equations').value.split(';');
+        const canvas = document.getElementById('graph');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const xMin = parseFloat(document.getElementById('xMin').value) || -10;
+        const xMax = parseFloat(document.getElementById('xMax').value) || 10;
+        const yMin = parseFloat(document.getElementById('yMin').value) || -10;
+        const yMax = parseFloat(document.getElementById('yMax').value) || 10;
+        const xDivisions = parseInt(document.getElementById('xDivisions').value) || 10;
+        const yDivisions = parseInt(document.getElementById('yDivisions').value) || 10;
+
+        drawGrid(ctx, width, height, xMin, xMax, yMin, yMax, xDivisions, yDivisions);
+
+        equations.forEach((equation, index) => {
+
+            ctx.beginPath();
+            for (let x = 0; x <= width; x++) {
+                const xValue = mapRange(x, 0, width, xMin, xMax);
+                const yValue = evaluateEquation(xValue, equation);
+                const y = mapRange(yValue, yMin, yMax, height, 0);
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            // Assign different colors for each graph
+            const colors = ['blue', 'red', 'green', 'orange', 'purple']; // You can add more colors as needed
+            ctx.strokeStyle = colors[index % colors.length];
+            ctx.stroke();
+        });
+    }
+
+    function evaluateEquation(x, equation) {
+        try {
+            const scope = { x: x };
+            const expression = math.compile(equation);
+            const result = expression.evaluate(scope);
+            return result;
+        } catch (error) {
+            console.error('Error evaluating equation:', error);
+            return NaN;
+        }
+    }
+
+    function drawGrid(ctx, width, height, xMin, xMax, yMin, yMax, xDivisions, yDivisions) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 0.5;
+
+        const xStep = (xMax - xMin) / xDivisions;
+        for (let i = 1; i < xDivisions; i++) {
+            const x = (i / xDivisions) * width;
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+        }
+
+        const yStep = (yMax - yMin) / yDivisions;
+        for (let i = 1; i < yDivisions; i++) {
+            const y = (i / yDivisions) * height;
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+        }
+
+        ctx.stroke();
+    }
+
+    function mapRange(value, fromLow, fromHigh, toLow, toHigh) {
+        return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+    }
+</script>
+</body>
+</html>
+
+
+
+
